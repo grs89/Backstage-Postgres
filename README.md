@@ -1,4 +1,4 @@
-# Backstage Docker Setup
+# Backstage Docker Setup.
 
 ## Estado Actual
 
@@ -25,9 +25,11 @@ La forma más estable de ejecutar Backstage en macOS (dado los problemas de comp
    docker compose up -d postgres
    ```
 
+
 2. **Instala dependencias localmente:**
    Esto compilará `isolated-vm` correctamente para tu Mac.
    ```bash
+   cd backstage-app
    yarn install
    ```
 
