@@ -1,4 +1,4 @@
-# Backstage Docker Setup
+# Backstage Docker Setup.
 
 ## Estado Actual
 
