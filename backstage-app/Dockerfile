@@ -4,6 +4,7 @@ FROM node:20-bookworm-slim AS build
 # Instalar dependencias del sistema necesarias para la compilación
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
+    python-is-python3 \
     g++ \
     make \
     pkg-config \
@@ -19,7 +20,7 @@ WORKDIR /app
 COPY --chown=node:node . .
 
 # Instalar dependencias
-RUN yarn install --network-timeout 600000 --mode=skip-build
+RUN yarn install --network-timeout 600000
 
 # Compilar el backend y el frontend
 RUN yarn tsc
