@@ -21,7 +21,7 @@ services:
 
   backstage:
     build:
-      context: .
+      context: ./backstage-app
       dockerfile: Dockerfile
     container_name: backstage-app
     restart: unless-stopped

@@ -1,0 +1,24 @@
+app:
+  # Should be configures to the reverse proxy or load balancer hostname
+  baseUrl: http://localhost:3000
+
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+  
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      database: backstage
+
+# Scaffolder configuration provided to disable isolated-vm if needed, 
+# though usage of pre-built bundle might handle native deps differently.
+scaffolder:
+  defaultTemplating:
+    enableAdditionalTemplateFilters: false
+    secure: false

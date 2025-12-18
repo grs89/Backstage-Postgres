@@ -1,175 +1,51 @@
-# Backstage Docker Compose
+# Backstage Docker Setup
 
-Este directorio contiene la configuración para ejecutar Backstage usando Docker Compose.
+## Estado Actual
 
-## 📋 Requisitos
+La aplicación Backstage se ha configurado correctamente con Docker Compose y un Dockerfile multi-stage. Todos los archivos de la aplicación (`packages/`, `app-config.yaml`, etc.) se han generado localmente.
 
-- Docker Engine 20.10+
-- Docker Compose 2.0+
+### ✅ Lo que funciona:
+1. **Docker Compose**: Levanta PostgreSQL y el contenedor de la app.
+2. **Build de Docker**: La imagen se construye correctamente.
+3. **Inicio de la App**: Backstage arranca y es accesible en `http://localhost:3000`.
 
-## 🚀 Inicio Rápido
+### ⚠️ Limitaciones Conocidas (Scaffolder Deshabilitado):
+El plugin **Scaffolder** está deshabilitado en el código (`packages/backend/src/index.ts`) debido a problemas de compilación con la dependencia nativa `isolated-vm` en el entorno Docker.
 
-1. **Iniciar los servicios:**
+Si necesitas la funcionalidad de plantillas (Scaffolder), deberás ejecutar la aplicación localmente fuera de Docker (ver sección de Desarrollo Local abajo) o resolver la compilación de `isolated-vm` en el Dockerfile.
 
-```bash
-docker-compose up -d
-```
+## 🚀 Solución Recomendada: Desarrollo Local
 
-2. **Verificar el estado:**
+La forma más estable de ejecutar Backstage en macOS (dado los problemas de compilación cruzada en Docker) es ejecutar la app en tu máquina host y la base de datos en Docker.
 
-```bash
-docker-compose ps
-```
+### Pasos:
 
-3. **Acceder a Backstage:**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:7007
-
-## 📁 Estructura de Archivos
-
-- `docker-compose.yml` - Definición de servicios (Backstage + PostgreSQL)
-- `app-config.yaml` - Configuración principal de Backstage
-- `app-config.local.yaml` - Configuraciones locales y sensibles (no versionado)
-- `.env.example` - Plantilla de variables de entorno
-
-## ⚙️ Configuración
-
-### Variables de Entorno
-
-Copia el archivo de ejemplo y personalízalo:
-
-```bash
-cp .env.example .env
-```
-
-Edita `.env` con tus valores:
-- Credenciales de la base de datos
-- Tokens de integración (GitHub, GitLab, etc.)
-
-### Integraciones
-
-Para habilitar integraciones (GitHub, GitLab, etc.):
-
-1. Edita `app-config.local.yaml` con tus tokens
-2. Descomenta las secciones relevantes en `app-config.yaml`
-
-**Ejemplo para GitHub:**
-
-```yaml
-integrations:
-  github:
-    - host: github.com
-      token: ${GITHUB_TOKEN}
-```
-
-## 🗄️ Base de Datos
-
-PostgreSQL está configurado con:
-- Usuario: `backstage`
-- Contraseña: `backstage_password` (cambiar en producción)
-- Base de datos: `backstage`
-- Puerto: `5432`
-
-Los datos se persisten en el volumen `postgres-data`.
-
-## 📝 Comandos Útiles
-
-### Ver logs
-
-```bash
-# Todos los servicios
-docker-compose logs -f
-
-# Solo Backstage
-docker-compose logs -f backstage
-
-# Solo PostgreSQL
-docker-compose logs -f postgres
-```
-
-### Reiniciar servicios
-
-```bash
-docker-compose restart
-```
-
-### Detener servicios
-
-```bash
-docker-compose down
-```
-
-### Detener y eliminar volúmenes
-
-```bash
-docker-compose down -v
-```
-
-## 🔧 Personalización
-
-### Modificar puertos
-
-Edita el archivo `docker-compose.yml` en la sección `ports`:
-
-```yaml
-ports:
-  - "3000:3000"  # Frontend
-  - "7007:7007"  # Backend
-```
-
-### Usar una imagen específica de Backstage
-
-Si tienes tu propia imagen de Backstage:
-
-```yaml
-backstage:
-  image: tu-registry/backstage:tag
-  # o para construir localmente:
-  # build: ./path/to/backstage
-```
-
-## 🔐 Seguridad
-
-> **IMPORTANTE**: Este setup es para desarrollo local. Para producción:
-
-- [ ] Cambia todas las contraseñas predeterminadas
-- [ ] Usa secretos de Docker o gestores de secretos
-- [ ] Configura HTTPS/TLS
-- [ ] Implementa autenticación apropiada
-- [ ] Revisa las políticas de CORS y CSP
-
-## 📚 Recursos
-
-- [Documentación oficial de Backstage](https://backstage.io/docs)
-- [Backstage GitHub](https://github.com/backstage/backstage)
-- [Guía de configuración](https://backstage.io/docs/conf/)
-
-## 🐛 Troubleshooting
-
-### Backstage no puede conectar a la base de datos
-
-1. Verifica que PostgreSQL esté saludable:
+1. **Asegúrate de que PostgreSQL esté corriendo:**
    ```bash
-   docker-compose ps
+   docker compose up -d postgres
    ```
 
-2. Revisa los logs:
+2. **Instala dependencias localmente:**
+   Esto compilará `isolated-vm` correctamente para tu Mac.
    ```bash
-   docker-compose logs postgres
+   yarn install
    ```
 
-### Puerto ya en uso
+3. **Inicia Backstage:**
+   ```bash
+   yarn dev
+   ```
+   
+   Accede a http://localhost:3000
 
-Si los puertos 3000 o 7007 están ocupados, modifica el `docker-compose.yml`:
+## 🔧 Intentar Docker de nuevo
 
-```yaml
-ports:
-  - "8080:3000"  # Usar puerto 8080 en lugar de 3000
-```
+Si deseas intentar arreglar la compilación en Docker en el futuro:
+1. Necesitas investigar por qué `node-gyp` falla al compilar `isolated-vm` en `node:20-bookworm-slim`.
+2. Podrías intentar usar una imagen base más completa como `node:20-bullseye` (no slim) que tenga más herramientas de desarrollo, aunque `build-essential` y `python3` ya se están instalando.
 
-### Reinstalar desde cero
-
-```bash
-docker-compose down -v
-docker-compose up -d
-```
+## Archivos Importantes
+- `docker-compose.yml`: Orquestación de servicios (en raíz).
+- `backstage-app/Dockerfile`: Definición de la imagen.
+- `backstage-app/app-config.production.yaml`: Configuración para producción.
+- `backstage-app/`: Directorio con el código fuente de la aplicación.
