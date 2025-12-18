@@ -1,0 +1,15 @@
+node_modules
+dist
+build
+.git
+.env
+.env.local
+*.log
+postgres-data
+.DS_Store
+Thumbs.db
+*.md
+!README.md
+packages
+yarn.lock
+package.json

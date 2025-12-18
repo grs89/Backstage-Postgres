@@ -1,0 +1,70 @@
+app:
+  title: Backstage
+  baseUrl: http://localhost:3000
+
+organization:
+  name: Mi Organización
+
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+  csp:
+    connect-src: ["'self'", 'http:', 'https:']
+  cors:
+    origin: http://localhost:3000
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      database: backstage
+
+integrations:
+  github:
+    - host: github.com
+      # token: ${GITHUB_TOKEN} # Descomentar y configurar para usar GitHub
+
+auth:
+  # Configurar autenticación según necesidades
+  providers: {}
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+  rules:
+    - allow: [Component, System, API, Resource, Location]
+  locations:
+    # Ejemplo de catálogo local
+    - type: file
+      target: ../../examples/entities.yaml
+    
+    # Ejemplo de catálogo desde URL
+    # - type: url
+    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
+
+# Configuración de proxies para integraciones
+proxy:
+  # Ejemplo de proxy para APIs externas
+  # '/circleci/api':
+  #   target: https://circleci.com/api/v1.1
+  #   headers:
+  #     Circle-Token: ${CIRCLECI_AUTH_TOKEN}
+
+techdocs:
+  builder: 'local'
+  generator:
+    runIn: 'docker'
+  publisher:
+    type: 'local'
+
+scaffolder:
+  # Configuración del scaffolder
+  defaultAuthor:
+    name: Backstage User
+    email: user@example.com

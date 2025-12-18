@@ -1,0 +1,14 @@
+# Archivos de configuración local
+app-config.local.yaml
+.env
+
+# Datos de la base de datos
+postgres-data/
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
